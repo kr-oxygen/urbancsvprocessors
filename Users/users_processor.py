@@ -25,7 +25,7 @@ class User(object):
 		self.record_type_id = User.person_record_type_id
 
 	def process_date(self, d):
-		return d if not d or 'NULL' == d else datetime.strptime(d, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%SZ')
+		return '' if not d or 'NULL' == d else datetime.strptime(d, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%SZ')
 
 	def process_name(self):
 		if self.name == 'NULL':
