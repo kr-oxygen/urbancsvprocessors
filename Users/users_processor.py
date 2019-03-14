@@ -45,8 +45,7 @@ class User(object):
 
 def main():
 	users = []
-
-	with open('usersFromDb.csv', mode='r') as fread:
+	with open(os.path.join(os.path.dirname(__file__), 'usersFromDb.csv'), mode='r') as fread:
 		raw = csv.DictReader(fread)
 
 		for row in raw:
@@ -57,7 +56,7 @@ def main():
 	users_dict = [user.__dict__ for user in users]
 
 
-	with open('usersProcessed.csv', mode='w') as fwrite:
+	with open(os.path.join(os.path.dirname(__file__),'usersProcessed.csv'), mode='w') as fwrite:
 		fields = users[0].__dict__.keys()
 		writer = csv.DictWriter(fwrite, users[0].__dict__.keys())
 		writer.writeheader()
@@ -66,10 +65,10 @@ def main():
 		# (fwrite, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 
 def process_extract():
-	with open('extract.csv', mode='r') as rf:
+	with open(os.path.join(os.path.dirname(__file__),'extract.csv'), mode='r') as rf:
 		raw = csv.DictReader(rf)
 
-		with open('extractProcessed.csv', mode='w') as wf:
+		with open(os.path.join(os.path.dirname(__file__),'extractProcessed.csv'), mode='w') as wf:
 
 			writer = csv.DictWriter(wf, raw.fieldnames)
 			# ['ID', 'MIGRATION_ID__C'])

@@ -2,7 +2,7 @@ import csv
 import os
 
 def errors():
-	with open('error030719081755151 Wines Load1.csv', mode='r', encoding='utf-8', errors='ignore') as f:
+	with open(os.path.join(os.path.dirname(__file__),'error030719081755151 Wines Load1.csv'), mode='r', encoding='utf-8', errors='ignore') as f:
 		reader = csv.DictReader(f)
 		
 		restricted_picklist_errors = 0
@@ -25,10 +25,10 @@ def map_producer_ids_from_sf():
 		producer_reader = csv.DictReader(producers)
 		producsers_map = dict((row['MIGRATION_ID__C'], row['ID']) for row in producer_reader)
 
-		with open('wines5.csv', mode='r') as wines:
+		with open(os.path.join(os.path.dirname(__file__),'wines5.csv'), mode='r') as wines:
 			wines_reader = csv.DictReader(wines, delimiter='\t')
 
-			with open('wines5withproducers.csv', mode='w') as wines_with_producers:
+			with open(os.path.join(os.path.dirname(__file__),'wines5withproducers.csv'), mode='w') as wines_with_producers:
 				columns = wines_reader.fieldnames.copy()
 				columns.append('PRODUCER_SALESFORCE_ID')
 				
@@ -36,7 +36,7 @@ def map_producer_ids_from_sf():
 				
 				writer.writeheader()
 
-				with open('wineswithoutproducers.csv', mode='w') as wines_without_producers:
+				with open(os.path.join(os.path.dirname(__file__),'wineswithoutproducers.csv'), mode='w') as wines_without_producers:
 					ww = csv.DictWriter(wines_without_producers, wines_reader.fieldnames)
 					ww.writeheader()
 				
@@ -51,7 +51,7 @@ def map_producer_ids_from_sf():
 							writer.writerow(new_row)
 
 def process_errors():
-	with open('/Users/roman/Downloads/UrbanMigration/Wines/error031119094053007.csv', mode='r') as errors_file:
+	with open(os.path.join(os.path.dirname(__file__),'error031119094053007.csv'), mode='r') as errors_file:
 		errors_reader = csv.DictReader(errors_file)
 
 		countries_to_region_dict = {}
@@ -73,7 +73,7 @@ def process_errors():
 				print(f'\t{item}')
 
 def error_records():
-	with open('/Users/roman/Downloads/UrbanMigration/Wines/error031119094053007.csv', 'r') as errors:
+	with open(os.path.join(os.path.dirname(__file__),'error031119094053007.csv'), 'r') as errors:
 		errors_reader = csv.DictReader(errors)
 		ids = set()
 		for error in errors_reader:
