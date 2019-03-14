@@ -1,12 +1,15 @@
 #Mapping values
-#Mon Mar 04 10:08:55 EET 2019
+#Thu Mar 14 13:51:06 IST 2019
 id=Migration_Id__c
+deleted=Deleted_On__c
 country=BillingCountry
+record_type_id=RecordTypeId
+created=CreatedDate
 city=BillingCity
+updated=LastModifiedDate
 first_name=FirstName
 phone=Phone
 email=PersonEmail
 zipcode=BillingPostalCode
 stripe_customer=Stripe_Customer__c
 last_name=LastName
-record_type_id=RecordTypeId
