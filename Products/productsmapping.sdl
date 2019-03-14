@@ -1,0 +1,19 @@
+#Mapping values
+#Tue Mar 12 16:30:47 EET 2019
+Year=Year__c
+SFWarehouseCellId=Warehouse_Cell__c
+SFWineId=Wine__c
+OnSale=Is_On_Sale__c
+Id=Migration_Id__c
+BracketsWineName=Brackets_Wine_Name__c
+Price=Price__c
+SFWarehouseId=Warehouse__c
+BottleContentSize=Bottle_Content_Size__c
+PhotoCondition=Photo__c
+Status=Status__c
+SFProducerId=Producer__c
+SFMainPhotoId=Main_Photo__c
+RecordTypeId=RecordTypeId
+TypeOfWineYear=Type_of_Wine_Year__c
+SFAccountId=Account__c
+InStock=Is_in_Stock__c

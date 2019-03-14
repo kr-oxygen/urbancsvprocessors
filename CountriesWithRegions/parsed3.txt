@@ -1,0 +1,223 @@
+Albania
+Fiambala
+La Rioja
+Jujuy
+Cafayate
+Catamarca
+Mendoza
+Patagonia
+Famatina
+Salta
+San Juan
+South Australia
+New South Wales
+Northern Territory
+Queensland
+South Eastern Australia
+Western Australian
+Victoria
+Tasmanian
+Weinviertel
+Kamptal
+Kremstal
+Traisental
+Niederösterreich
+Wagram
+Bergland
+Neusiedlersee-Hügelland
+Steiermark
+Thermenregion
+Wachau
+Carnuntum
+Burgenland
+Neusiedlersee
+Vienna
+Belgium
+Brazil
+Bulgaria
+New Brunswick
+Newfoundland and Labrador
+Saskatchewan
+Nova Scotia
+Alberta
+Quebec
+Ontario
+British Columbia
+Manitoba
+Rapel Valley
+Cachapoal Valley
+Central Valley
+Elqui Valley
+Maule Valley
+San Antonio Valley
+Colchagua Valley
+Itata Valley
+Leyda Valley
+Maipo Valley
+Aconcagua Valley
+Atacama
+Bio Bio Valley
+Choapa Valley
+Casablanca Valley
+Curico Valley
+Limari Valley
+Malleco Valley
+Shanxi
+Dalmatinska Zagora
+Peljesac Peninsula
+Kontinentalna Hrvatska
+Primorska Hrvatska
+Istria
+Island of Hvar
+Srednja I Juzna Dalmacija
+Czech Republic
+Denmark
+Alsace
+Champagne
+Rhone
+Provence
+Loire
+Bordeaux
+Burgundy
+Vin de Pays
+Vin de France
+Beaujolais
+Calvados
+Languedoc-Roussillon
+Cognac
+Corsica
+Sauternes
+Jura
+Savoie
+Armagnac
+Moselle
+South West France
+Alazani Valley
+Kakheti
+Racha-Lechkhumi
+Mosel
+Pfalz
+Rheinhessen
+Rheingau
+Saale-Unstrut
+Baden
+Franken
+Sachsen
+Nahe
+Hessische Bergstrasse
+Württemberg
+Ahr
+Mittelrhein
+Sitia
+Santorini
+Tokaj
+Villany-Siklos
+Eger
+Badacsony
+Veneto
+Piemonte
+Calabria
+Liguria
+Puglia
+Sardinia
+Tuscany
+Abruzzo
+Umbria
+Molise
+Marche
+Friuli-Venezia Giulia
+Campania
+Lazio
+San Marino
+Trentino-Alto Adige
+Aosta Valley
+Basilicata
+Emilia-Romagna
+Lombardy
+Sicily
+Japan
+Bekaa Valley
+Luxembourg
+Macedonia
+Baja California
+Ensenada
+Parras Valley
+Valle de Guadalupe
+Morocco
+Martinborough
+Marlborough
+Hawke's Bay
+Central Otago
+Nelson
+Waiheke Island
+Auckland
+Canterbury
+Waipara
+Waitaki Valley
+Northland
+Gisborne
+Wairapara
+Norway
+Peru
+Douro
+Azores
+Estremadura-Lisboa
+Beiras
+Minho
+Transmontano
+Alentejo
+Madeira
+Dao
+Setubal Peninsula
+Tejo
+Colares
+Algarve
+Romania
+Slovakia
+Podravje
+Primorski
+Western Cape
+Orange River
+Rioja
+Castilla La Mancha
+Pais Vasco
+Aragon
+Balearic Islands
+Murcia
+Valencia
+Vinos de Pago
+Madrid
+Catalonia
+Asturias
+Canary Islands
+Extremadura
+Navarra
+Castilla y León
+Galicia
+Andalucia
+Cantabria
+Sweden
+Aargau
+Geneva
+Vaud
+Zurcher Weinland
+Graubunden
+Ticino
+Neuchatel
+Rheintal
+Schaffausen
+Thurgau
+Valais
+Zurichsee
+Thailand
+Turkey
+Idaho
+Oregon
+California
+Washington
+Scotland
+Wales
+England
+Jersey
+Northern Ireland
+Uruguay

@@ -1,0 +1,2 @@
+---===Product Photo===---
+BottleId(int), PhotoLink(Text)

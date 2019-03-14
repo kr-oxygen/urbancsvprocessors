@@ -1,0 +1,307 @@
+{
+  "Albania": [
+    "Albania"
+  ],
+  "Argentina": [
+    "Cafayate",
+    "Catamarca",
+    "Famatina",
+    "Fiambala",
+    "Jujuy",
+    "La Rioja",
+    "Mendoza",
+    "Patagonia",
+    "Salta",
+    "San Juan"
+  ],
+  "Australia": [
+    "New South Wales",
+    "Northern Territory",
+    "Queensland",
+    "South Australia",
+    "South Eastern Australia",
+    "Tasmanian",
+    "Victoria",
+    "Western Australian"
+  ],
+  "Austria": [
+    "Bergland",
+    "Burgenland",
+    "Carnuntum",
+    "Kamptal",
+    "Kremstal",
+    "Neusiedlersee",
+    "Neusiedlersee-Hügelland",
+    "Niederösterreich",
+    "Steiermark",
+    "Thermenregion",
+    "Traisental",
+    "Vienna",
+    "Wachau",
+    "Wagram",
+    "Weinviertel"
+  ],
+  "Belgium": [
+    "Belgium"
+  ],
+  "Brazil": [
+    "Brazil"
+  ],
+  "Bulgaria": [
+    "Bulgaria"
+  ],
+  "Canada": [
+    "Alberta",
+    "British Columbia",
+    "Manitoba",
+    "New Brunswick",
+    "Newfoundland and Labrador",
+    "Nova Scotia",
+    "Ontario",
+    "Quebec",
+    "Saskatchewan"
+  ],
+  "Chile": [
+    "Aconcagua Valley",
+    "Atacama",
+    "Bio Bio Valley",
+    "Cachapoal Valley",
+    "Casablanca Valley",
+    "Central Valley",
+    "Choapa Valley",
+    "Colchagua Valley",
+    "Curico Valley",
+    "Elqui Valley",
+    "Itata Valley",
+    "Leyda Valley",
+    "Limari Valley",
+    "Maipo Valley",
+    "Malleco Valley",
+    "Maule Valley",
+    "Rapel Valley",
+    "San Antonio Valley"
+  ],
+  "China": [
+    "Shanxi"
+  ],
+  "Croatia": [
+    "Dalmatinska Zagora",
+    "Island of Hvar",
+    "Istria",
+    "Kontinentalna Hrvatska",
+    "Peljesac Peninsula",
+    "Primorska Hrvatska",
+    "Srednja I Juzna Dalmacija"
+  ],
+  "Czech Republic": [
+    "Czech Republic"
+  ],
+  "Denmark": [
+    "Denmark"
+  ],
+  "France": [
+    "Alsace",
+    "Armagnac",
+    "Beaujolais",
+    "Bordeaux",
+    "Burgundy",
+    "Calvados",
+    "Champagne",
+    "Cognac",
+    "Corsica",
+    "Jura",
+    "Languedoc-Roussillon",
+    "Loire",
+    "Moselle",
+    "Provence",
+    "Rhone",
+    "Sauternes",
+    "Savoie",
+    "South West France",
+    "Vin de France",
+    "Vin de Pays"
+  ],
+  "Georgia": [
+    "Alazani Valley",
+    "Kakheti",
+    "Racha-Lechkhumi"
+  ],
+  "Germany": [
+    "Ahr",
+    "Baden",
+    "Franken",
+    "Hessische Bergstrasse",
+    "Mittelrhein",
+    "Mosel",
+    "Nahe",
+    "Pfalz",
+    "Rheingau",
+    "Rheinhessen",
+    "Saale-Unstrut",
+    "Sachsen",
+    "Württemberg"
+  ],
+  "Greece": [
+    "Santorini",
+    "Sitia"
+  ],
+  "Hungary": [
+    "Badacsony",
+    "Eger",
+    "Tokaj",
+    "Villany-Siklos"
+  ],
+  "Italy": [
+    "Abruzzo",
+    "Aosta Valley",
+    "Basilicata",
+    "Calabria",
+    "Campania",
+    "Emilia-Romagna",
+    "Friuli-Venezia Giulia",
+    "Lazio",
+    "Liguria",
+    "Lombardy",
+    "Marche",
+    "Molise",
+    "Piemonte",
+    "Puglia",
+    "San Marino",
+    "Sardinia",
+    "Sicily",
+    "Trentino-Alto Adige",
+    "Tuscany",
+    "Umbria",
+    "Veneto"
+  ],
+  "Japan": [
+    "Japan"
+  ],
+  "Lebanon": [
+    "Bekaa Valley"
+  ],
+  "Luxembourg": [
+    "Luxembourg"
+  ],
+  "Macedonia": [
+    "Macedonia"
+  ],
+  "Mexico": [
+    "Baja California",
+    "Ensenada",
+    "Parras Valley",
+    "Valle de Guadalupe"
+  ],
+  "Morocco": [
+    "Morocco"
+  ],
+  "New Zealand": [
+    "Auckland",
+    "Canterbury",
+    "Central Otago",
+    "Gisborne",
+    "Hawke's Bay",
+    "Marlborough",
+    "Martinborough",
+    "Nelson",
+    "Northland",
+    "Waiheke Island",
+    "Waipara",
+    "Wairapara",
+    "Waitaki Valley"
+  ],
+  "Norway": [
+    "Norway"
+  ],
+  "Peru": [
+    "Peru"
+  ],
+  "Portugal": [
+    "Alentejo",
+    "Algarve",
+    "Azores",
+    "Beiras",
+    "Colares",
+    "Dao",
+    "Douro",
+    "Estremadura-Lisboa",
+    "Madeira",
+    "Minho",
+    "Setubal Peninsula",
+    "Tejo",
+    "Transmontano"
+  ],
+  "Romania": [
+    "Romania"
+  ],
+  "Slovakia": [
+    "Slovakia"
+  ],
+  "Slovenia": [
+    "Podravje",
+    "Primorski"
+  ],
+  "South Africa": [
+    "Orange River",
+    "Western Cape"
+  ],
+  "Spain": [
+    "Andalucia",
+    "Aragon",
+    "Asturias",
+    "Balearic Islands",
+    "Canary Islands",
+    "Cantabria",
+    "Castilla La Mancha",
+    "Castilla y León",
+    "Catalonia",
+    "Extremadura",
+    "Galicia",
+    "Madrid",
+    "Murcia",
+    "Navarra",
+    "Pais Vasco",
+    "Rioja",
+    "Valencia",
+    "Vinos de Pago"
+  ],
+  "Sweden": [
+    "Sweden"
+  ],
+  "Switzerland": [
+    "Aargau",
+    "Geneva",
+    "Graubunden",
+    "Neuchatel",
+    "Rheintal",
+    "Schaffausen",
+    "Thurgau",
+    "Ticino",
+    "Valais",
+    "Vaud",
+    "Zurcher Weinland",
+    "Zurichsee"
+  ],
+  "Thailand": [
+    "Thailand"
+  ],
+  "Turkey": [
+    "Turkey"
+  ],
+  "United Kingdom": [
+    "England",
+    "Jersey",
+    "Northern Ireland",
+    "Scotland",
+    "Wales"
+  ],
+  "United States": [
+    "California",
+    "Idaho",
+    "Oregon",
+    "Washington"
+  ],
+  "Uruguay": [
+    "Uruguay"
+  ]
+}

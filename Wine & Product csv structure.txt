@@ -1,0 +1,5 @@
+---===Wine===---
+Id(int), Name(Text), ProducerId(int), Country(Text), Region(Text), WineType(Text), Subregion(Text), Appellation(Text)
+
+---===Product===---
+Id(int), AccountId(int), BottleContentSize(Text), Case size(2-12), Case Type(OC, OWC, CB), GiftBox(bool), InStock(bool), OnSale(bool), PhotoLink(String), PhotoCondition(Condition A, Not Condition A, Unique Label), Price(decimal), Status(Incoming, Warehoused, Handed Out), TypeOfWineYear(Vintage, Bottled), WarehouseCellLocation(text - should be name of the cell location), WineId(int), Year(text), BracketsWineName(text), IsBox(bool), WarehouseCellLocationName(text - should be name of the cellar location)

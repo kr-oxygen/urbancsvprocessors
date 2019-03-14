@@ -1,0 +1,9 @@
+#Mapping values
+#Mon Mar 11 21:40:36 EET 2019
+Name=Name
+Id=Migration_Id__c
+WineType=Wine_type__c
+PRODUCER_SALESFORCE_ID=Producer__c
+Region=Region__c
+Country=Country__c
+Appellation=Appellation__c

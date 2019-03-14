@@ -1,0 +1,12 @@
+#Mapping values
+#Mon Mar 04 10:08:55 EET 2019
+id=Migration_Id__c
+country=BillingCountry
+city=BillingCity
+first_name=FirstName
+phone=Phone
+email=PersonEmail
+zipcode=BillingPostalCode
+stripe_customer=Stripe_Customer__c
+last_name=LastName
+record_type_id=RecordTypeId

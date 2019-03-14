@@ -1,0 +1,265 @@
+Albania
+
+Argentina
+        Fiambala
+        La Rioja
+        Jujuy
+        Cafayate
+        Catamarca
+        Mendoza
+        Patagonia
+        Famatina
+        Salta
+        San Juan
+Australia
+        South Australia
+        New South Wales
+        Northern Territory
+        Queensland
+        South Eastern Australia
+        Western Australian
+        Victoria
+        Tasmanian
+Austria
+        Weinviertel
+        Kamptal
+        Kremstal
+        Traisental
+        Niederösterreich
+        Wagram
+        Bergland
+        Neusiedlersee-Hügelland
+        Steiermark
+        Thermenregion
+        Wachau
+        Carnuntum
+        Burgenland
+        Neusiedlersee
+        Vienna
+Belgium
+        Belgium
+Brazil
+        Brazil
+Bulgaria
+        Bulgaria
+Canada
+        New Brunswick
+        Newfoundland and Labrador
+        Saskatchewan
+        Nova Scotia
+        Alberta
+        Quebec
+        Ontario
+        British Columbia
+        Manitoba
+Chile
+        Rapel Valley
+        Cachapoal Valley
+        Central Valley
+        Elqui Valley
+        Maule Valley
+        San Antonio Valley
+        Colchagua Valley
+        Itata Valley
+        Leyda Valley
+        Maipo Valley
+        Aconcagua Valley
+        Atacama
+        Bio Bio Valley
+        Choapa Valley
+        Casablanca Valley
+        Curico Valley
+        Limari Valley
+        Malleco Valley
+China
+        Shanxi
+Croatia
+        Dalmatinska Zagora
+        Peljesac Peninsula
+        Kontinentalna Hrvatska
+        Primorska Hrvatska
+        Istria
+        Island of Hvar
+        Srednja I Juzna Dalmacija
+Czech Republic
+
+Denmark
+        Denmark
+England
+
+France
+        Alsace
+        Champagne
+        Rhone
+        Provence
+        Loire
+        Bordeaux
+        Burgundy
+        Vin de Pays
+        Vin de France
+        Beaujolais
+        Calvados
+        Languedoc-Roussillon
+        Cognac
+        Corsica
+        Sauternes
+        Jura
+        Savoie
+        Armagnac
+        Moselle
+        South West France
+Georgia
+        Alazani Valley
+        Kakheti
+        Racha-Lechkhumi
+Germany
+        Mosel
+        Pfalz
+        Rheinhessen
+        Rheingau
+        Saale-Unstrut
+        Baden
+        Franken
+        Sachsen
+        Nahe
+        Hessische Bergstrasse
+        Württemberg
+        Ahr
+        Mittelrhein
+Greece
+        Sitia
+        Santorini
+Hungary
+        Tokaj
+        Villany-Siklos
+        Eger
+        Badacsony
+Italy
+        Veneto
+        Piemonte
+        Calabria
+        Liguria
+        Puglia
+        Sardinia
+        Tuscany
+        Abruzzo
+        Umbria
+        Molise
+        Marche
+        Friuli-Venezia Giulia
+        Campania
+        Lazio
+        San Marino
+        Trentino-Alto Adige
+        Aosta Valley
+        Basilicata
+        Emilia-Romagna
+        Lombardy
+        Sicily
+Japan
+        Japan
+Lebanon
+        Bekaa Valley
+Luxembourg
+        Luxembourg
+Macedonia
+        Macedonia
+Mexico
+        Baja California
+        Ensenada
+        Parras Valley
+        Valle de Guadalupe
+Morocco
+
+New Zealand
+        Martinborough
+        Marlborough
+        Hawke's Bay
+        Central Otago
+        Nelson
+        Waiheke Island
+        Auckland
+        Canterbury
+        Waipara
+        Waitaki Valley
+        Northland
+        Gisborne
+        Wairapara
+Norway
+
+Peru
+
+Portugal
+        Douro
+        Azores
+        Estremadura-Lisboa
+        Beiras
+        Minho
+        Transmontano
+        Alentejo
+        Madeira
+        Dao
+        Setubal Peninsula
+        Tejo
+        Colares
+        Algarve
+													Romania
+															Romania
+Slovakia
+        Slovakia
+Slovenia
+        Podravje
+        Primorski
+South Africa
+        Western Cape
+        Orange River
+Spain
+        Rioja
+        Castilla La Mancha
+        Pais Vasco
+        Aragon
+        Balearic Islands
+        Murcia
+        Valencia
+        Vinos de Pago
+        Madrid
+        Catalonia
+        Asturias
+        Canary Islands
+        Extremadura
+        Navarra
+        Castilla y León
+        Galicia
+        Andalucia
+        Cantabria
+Sweden
+        Sweden
+Switzerland
+        Aargau
+        Geneva
+        Vaud
+        Zurcher Weinland
+        Graubunden
+        Ticino
+        Neuchatel
+        Rheintal
+        Schaffausen
+        Thurgau
+        Valais
+        Zurichsee
+Thailand
+        Thailand
+Turkey
+        Turkey
+USA
+        Idaho
+        Oregon
+        California
+        Washington
+United Kingdom
+        Scotland
+        Wales
+        England
+        Jersey
+        Northern Ireland
+Uruguay
