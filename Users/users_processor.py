@@ -1,5 +1,6 @@
 import os
 import csv
+from datetime import datetime
 
 class User(object):
 	unknown = 1
@@ -9,9 +10,9 @@ class User(object):
 		self.id = args[0]['id']
 		self.country = args[0]['countryname'] 
 		self.email = args[0]['email']
-		self.created = args[0]['created_at']
-		self.updated = args[0]['updated_at']
-		self.deleted = args[0]['deleted_at']
+		self.created = self.process_date(args[0]['created_at'])
+		self.updated = self.process_date(args[0]['updated_at'])
+		self.deleted = self.process_date(args[0]['deleted_at'])
 		self.stripe_customer = args[0]['stripe_customer_id']
 		self.name = args[0]['name']
 		self.phone = args[0]['phone_number']
@@ -22,6 +23,9 @@ class User(object):
 		self.process_name()
 		self.process_city()
 		self.record_type_id = User.person_record_type_id
+
+	def process_date(self, d):
+		return d if not d else datetime.strptime(d, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 	def process_name(self):
 		if self.name == 'NULL':
