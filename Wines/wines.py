@@ -25,10 +25,10 @@ def map_producer_ids_from_sf():
 		producer_reader = csv.DictReader(producers)
 		producsers_map = dict((row['MIGRATION_ID__C'], row['ID']) for row in producer_reader)
 
-		with open(os.path.join(os.path.dirname(__file__),'wines5.csv'), mode='r') as wines:
+		with open(os.path.join(os.path.dirname(__file__),'wines_new.csv'), mode='r') as wines:
 			wines_reader = csv.DictReader(wines, delimiter='\t')
 
-			with open(os.path.join(os.path.dirname(__file__),'wines5withproducers.csv'), mode='w') as wines_with_producers:
+			with open(os.path.join(os.path.dirname(__file__),'wineswithproducers.csv'), mode='w') as wines_with_producers:
 				columns = wines_reader.fieldnames.copy()
 				columns.append('PRODUCER_SALESFORCE_ID')
 				

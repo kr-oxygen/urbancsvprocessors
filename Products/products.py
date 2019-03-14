@@ -6,7 +6,7 @@ bottle_record_type_id = '0121t0000005h6JAAQ'
 def get_wines():
 	wine_id_to_wine_object_dict = dict()
 
-	with open(os.path.abspath(os.path.join('Wines', 'wineswithidsandproducers.csv')), mode='r') as wines:
+	with open(os.path.abspath(os.path.join('Wines', 'wineswithproducers.csv')), mode='r') as wines:
 		wines_reader = csv.DictReader(wines)
 
 		for wine in wines_reader:
@@ -60,7 +60,7 @@ def fill_products_with_sf_ids():
 
 	accounts_dict = dict()
 
-	with open(os.path.abspath(os.path.join('Users','userswithids.csv')), mode='r') as accounts:
+	with open(os.path.abspath(os.path.join('Users','usersFromSfProcessed.csv')), mode='r') as accounts:
 		accounts_reader = csv.DictReader(accounts)
 
 		for account in accounts_reader:
@@ -68,7 +68,7 @@ def fill_products_with_sf_ids():
 
 	errors = dict(Wines=dict(),Cells=dict(),Accounts=dict())
 
-	with open(os.path.join(os.path.dirname(__file__), 'products5.csv'), mode='r') as products:
+	with open(os.path.join(os.path.dirname(__file__), 'products_new.csv'), mode='r') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 		fields = set(reader.fieldnames)
 		fields.update(['SFWarehouseId', 'SFWarehouseCellId', 'SFMainPhotoId', 'SFAccountId', 'SFWineId', 'SFProducerId', 'RecordTypeId'])
@@ -168,7 +168,7 @@ def fill_photos():
 
 	photos_dict = dict()
 	
-	with open(os.path.join(os.path.dirname(__file__), 'products4.csv'), mode='r') as products:
+	with open(os.path.join(os.path.dirname(__file__), 'products_new.csv'), mode='r') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 
 		for row in reader:

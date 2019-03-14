@@ -65,10 +65,10 @@ def main():
 		# (fwrite, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 
 def process_extract():
-	with open(os.path.join(os.path.dirname(__file__),'extract.csv'), mode='r') as rf:
+	with open(os.path.join(os.path.dirname(__file__),'usersFromSf.csv'), mode='r') as rf:
 		raw = csv.DictReader(rf)
 
-		with open(os.path.join(os.path.dirname(__file__),'extractProcessed.csv'), mode='w') as wf:
+		with open(os.path.join(os.path.dirname(__file__),'usersFromSfProcessed.csv'), mode='w') as wf:
 
 			writer = csv.DictWriter(wf, raw.fieldnames)
 			# ['ID', 'MIGRATION_ID__C'])
