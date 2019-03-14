@@ -1,11 +1,12 @@
 import csv
+import os
 
 bottle_record_type_id = '0121t0000005h6JAAQ'
 
 def get_wines():
 	wine_id_to_wine_object_dict = dict()
 
-	with open('/Users/roman/Downloads/UrbanMigration/Wines/wineswithidsandproducers.csv', mode='r') as wines:
+	with open(os.path.join('Wines', 'wineswithidsandproducers.csv'), mode='r') as wines:
 		wines_reader = csv.DictReader(wines)
 
 		for wine in wines_reader:
@@ -33,7 +34,7 @@ def fill_products_with_sf_ids():
 	warehouse_id = None
 	cells_dict = dict()
 
-	with open('/Users/roman/Downloads/UrbanMigration/WineCellarLocations/cellswithids.csv', mode='r') as cells:
+	with open(os.path.abspath(os.path.join('WineCellarLocations', 'cellswithids.csv')), mode='r') as cells:
 		cells_reader = csv.DictReader(cells)
 
 		for cell in cells_reader:
@@ -43,7 +44,7 @@ def fill_products_with_sf_ids():
 	
 	photos_dict = dict()
 
-	with open('/Users/roman/Downloads/UrbanMigration/Photos/photoswithids.csv', mode='r') as photos:
+	with open(os.path.abspath(os.path.join('Photos','photoswithids.csv')), mode='r') as photos:
 		photos_reader = csv.DictReader(photos)
 
 		for photo in photos_reader:
@@ -59,7 +60,7 @@ def fill_products_with_sf_ids():
 
 	accounts_dict = dict()
 
-	with open('/Users/roman/Downloads/UrbanMigration/Users/userswithids.csv', mode='r') as accounts:
+	with open(os.path.abspath(os.path.join('Users','userswithids.csv')), mode='r') as accounts:
 		accounts_reader = csv.DictReader(accounts)
 
 		for account in accounts_reader:
@@ -67,12 +68,12 @@ def fill_products_with_sf_ids():
 
 	errors = dict(Wines=dict(),Cells=dict(),Accounts=dict())
 
-	with open('/Users/roman/Downloads/UrbanMigration/Products/products5.csv', mode='r') as products:
+	with open('products5.csv', mode='r') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 		fields = set(reader.fieldnames)
 		fields.update(['SFWarehouseId', 'SFWarehouseCellId', 'SFMainPhotoId', 'SFAccountId', 'SFWineId', 'SFProducerId', 'RecordTypeId'])
 
-		with open('/Users/roman/Downloads/UrbanMigration/Products/productswithdependencies.csv', mode='w') as product_with_deps:
+		with open('productswithdependencies.csv', mode='w') as product_with_deps:
 			writer = csv.DictWriter(product_with_deps, list(fields), delimiter='\t')
 
 			writer.writeheader()
@@ -140,7 +141,7 @@ def fill_products_with_sf_ids():
 	print('\n\n\n')
 
 	for ek,ev in errors.items():
-		with open(f'/Users/roman/Downloads/UrbanMigration/Products/{ek}_errors.txt', mode='w') as err:
+		with open(f'{ek}_errors.txt', mode='w') as err:
 			for evk, evv in ev.items():
 				if not evk:
 					print(f'{ek}, ",".join(evv)')
@@ -153,7 +154,7 @@ def fill_products_with_sf_ids():
 		# print(f'\t{",".join(ev.keys())}')
 
 
-	with open('/Users/roman/Downloads/UrbanMigration/Photos/photoswithproductids.csv', mode='w') as product_to_photo:
+	with open(os.path.abspath(os.path.join('Photos','photoswithproductids.csv')), mode='w') as product_to_photo:
 		writer = csv.DictWriter(product_to_photo, ['ProductId', 'SFPhotoId'])
 
 		writer.writeheader()
@@ -167,7 +168,7 @@ def fill_photos():
 
 	photos_dict = dict()
 	
-	with open('/Users/roman/Downloads/UrbanMigration/Products/products4.csv', mode='r') as products:
+	with open('products4.csv', mode='r') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 
 		for row in reader:
@@ -183,10 +184,9 @@ def fill_photos():
 
 			if link not in photos_dict:
 				photos_dict[bottle_unique_name] = set()
-
 			photos_dict[bottle_unique_name].add(link)
 
-	with open('/Users/roman/Downloads/UrbanMigration/Photos/photos.csv', mode='w') as photos:
+	with open(os.path.abspath(os.path.join('Photos', 'photos.csv')), mode='w') as photos:
 		photo_fields = ['Photo_Unique_Name__c', 'Link']
 
 		writer = csv.DictWriter(photos, photo_fields)
@@ -196,7 +196,7 @@ def fill_photos():
 			writer.writerow(dict(Photo_Unique_Name__c=k, Link=v.pop()))
 
 def process_insert_errors():
-	with open('/Users/roman/Downloads/UrbanMigration/Products/error031319085916067.csv', mode='r') as errors:
+	with open('error031319085916067.csv', mode='r') as errors:
 		errors_reader = csv.DictReader(errors)
 
 		error_messages = set()
@@ -209,4 +209,5 @@ def process_insert_errors():
 			print(e)
 
 if __name__ == '__main__':
-	process_insert_errors()
+	# fill_photos() # call first to generate s3 photo object then extract ids to insert that ids to the product
+	process_insert_errors() # call after photo processing

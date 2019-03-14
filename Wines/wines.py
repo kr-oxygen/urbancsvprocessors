@@ -1,7 +1,8 @@
 import csv
+import os
 
 def errors():
-	with open('/Users/roman/Downloads/UrbanMigration/Wines/error030719081755151 Wines Load1.csv', mode='r', encoding='utf-8', errors='ignore') as f:
+	with open('error030719081755151 Wines Load1.csv', mode='r', encoding='utf-8', errors='ignore') as f:
 		reader = csv.DictReader(f)
 		
 		restricted_picklist_errors = 0
@@ -20,14 +21,14 @@ def errors():
 		print(f'Not Restricted errors number is {other_errors}')
 
 def map_producer_ids_from_sf():
-	with open('/Users/roman/Downloads/UrbanMigration/Producers/producersids.csv', mode='r') as producers:
+	with open(os.path.abspath(os.path.join('Producers', 'producersids.csv')), mode='r') as producers:
 		producer_reader = csv.DictReader(producers)
 		producsers_map = dict((row['MIGRATION_ID__C'], row['ID']) for row in producer_reader)
 
-		with open('/Users/roman/Downloads/UrbanMigration/Wines/wines5.csv', mode='r') as wines:
+		with open('wines5.csv', mode='r') as wines:
 			wines_reader = csv.DictReader(wines, delimiter='\t')
 
-			with open('/Users/roman/Downloads/UrbanMigration/Wines/wines5withproducers.csv', mode='w') as wines_with_producers:
+			with open('wines5withproducers.csv', mode='w') as wines_with_producers:
 				columns = wines_reader.fieldnames.copy()
 				columns.append('PRODUCER_SALESFORCE_ID')
 				
@@ -35,7 +36,7 @@ def map_producer_ids_from_sf():
 				
 				writer.writeheader()
 
-				with open('/Users/roman/Downloads/UrbanMigration/Wines/wines5withoutproducers.csv', mode='w') as wines_without_producers:
+				with open('wineswithoutproducers.csv', mode='w') as wines_without_producers:
 					ww = csv.DictWriter(wines_without_producers, wines_reader.fieldnames)
 					ww.writeheader()
 				
