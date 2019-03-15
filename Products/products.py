@@ -6,7 +6,7 @@ bottle_record_type_id = '0121t0000005h6JAAQ'
 def get_wines():
 	wine_id_to_wine_object_dict = dict()
 
-	with open(os.path.abspath(os.path.join('Wines', 'wineswithproducers.csv')), mode='r') as wines:
+	with open(os.path.abspath(os.path.join('Wines', 'wineswithproducers.csv')), mode='r', encoding='utf-8') as wines:
 		wines_reader = csv.DictReader(wines)
 
 		for wine in wines_reader:
@@ -34,7 +34,7 @@ def fill_products_with_sf_ids():
 	warehouse_id = None
 	cells_dict = dict()
 
-	with open(os.path.abspath(os.path.join('WineCellarLocations', 'cellswithids.csv')), mode='r') as cells:
+	with open(os.path.abspath(os.path.join('WineCellarLocations', 'cellswithids.csv')), mode='r', encoding='utf-8') as cells:
 		cells_reader = csv.DictReader(cells)
 
 		for cell in cells_reader:
@@ -44,7 +44,7 @@ def fill_products_with_sf_ids():
 	
 	photos_dict = dict()
 
-	with open(os.path.abspath(os.path.join('Photos','photoswithids.csv')), mode='r') as photos:
+	with open(os.path.abspath(os.path.join('Photos','photoswithids.csv')), mode='r', encoding='utf-8') as photos:
 		photos_reader = csv.DictReader(photos)
 
 		for photo in photos_reader:
@@ -68,12 +68,12 @@ def fill_products_with_sf_ids():
 
 	errors = dict(Wines=dict(),Cells=dict(),Accounts=dict())
 
-	with open(os.path.join(os.path.dirname(__file__), 'products_new.csv'), mode='r') as products:
+	with open(os.path.join(os.path.dirname(__file__), 'products_new.csv'), mode='r', encoding='utf-8') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 		fields = set(reader.fieldnames)
 		fields.update(['SFWarehouseId', 'SFWarehouseCellId', 'SFMainPhotoId', 'SFAccountId', 'SFWineId', 'SFProducerId', 'RecordTypeId'])
 
-		with open(os.path.join(os.path.dirname(__file__), 'productswithdependencies.csv'), mode='w') as product_with_deps:
+		with open(os.path.join(os.path.dirname(__file__), 'productswithdependencies.csv'), mode='w', encoding='utf-8') as product_with_deps:
 			writer = csv.DictWriter(product_with_deps, list(fields), delimiter='\t')
 
 			writer.writeheader()
@@ -154,7 +154,7 @@ def fill_products_with_sf_ids():
 		# print(f'\t{",".join(ev.keys())}')
 
 
-	with open(os.path.abspath(os.path.join('Photos','photoswithproductids.csv')), mode='w') as product_to_photo:
+	with open(os.path.abspath(os.path.join('Photos','photoswithproductids.csv')), mode='w', encoding='utf-8') as product_to_photo:
 		writer = csv.DictWriter(product_to_photo, ['ProductId', 'SFPhotoId'])
 
 		writer.writeheader()
@@ -168,7 +168,7 @@ def fill_photos():
 
 	photos_dict = dict()
 	
-	with open(os.path.join(os.path.dirname(__file__), 'products_new.csv'), mode='r') as products:
+	with open(os.path.join(os.path.dirname(__file__), 'products_new.csv'), mode='r', encoding='utf-8') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 
 		for row in reader:
@@ -186,7 +186,7 @@ def fill_photos():
 				photos_dict[bottle_unique_name] = set()
 			photos_dict[bottle_unique_name].add(link)
 
-	with open(os.path.abspath(os.path.join('Photos', 'photos.csv')), mode='w') as photos:
+	with open(os.path.abspath(os.path.join('Photos', 'photos.csv')), mode='w', encoding='utf-8') as photos:
 		photo_fields = ['Photo_Unique_Name__c', 'Link']
 
 		writer = csv.DictWriter(photos, photo_fields)
@@ -196,7 +196,7 @@ def fill_photos():
 			writer.writerow(dict(Photo_Unique_Name__c=k, Link=v.pop()))
 
 def process_insert_errors():
-	with open(os.path.join(os.path.dirname(__file__), 'error031319085916067.csv'), mode='r') as errors:
+	with open(os.path.join(os.path.dirname(__file__), 'error031319085916067.csv'), mode='r', encoding='utf-8') as errors:
 		errors_reader = csv.DictReader(errors)
 
 		error_messages = set()
@@ -209,6 +209,6 @@ def process_insert_errors():
 			print(e)
 
 if __name__ == '__main__':
-	fill_photos() # call first to generate s3 photo object then extract ids to insert that ids to the product
-	# fill_products_with_sf_ids() # then call this one
+	# fill_photos() # call first to generate s3 photo object then extract ids to insert that ids to the product
+	fill_products_with_sf_ids() # then call this one
 	# process_insert_errors() # call after photo processing
