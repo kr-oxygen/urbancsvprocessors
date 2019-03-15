@@ -83,6 +83,7 @@ def fill_products_with_sf_ids():
 			for bottle in reader:
 				# copy initial bottle details
 				new_bottle = dict(bottle.items())
+				new_bottle['Year'] = new_bottle['Year'] if new_bottle['Year'] or new_bottle['Year'] == '' else 9999
 
 				wine = wine_id_to_wine_object_dict.get(bottle['WineId'], None)
 
