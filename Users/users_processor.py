@@ -4,18 +4,23 @@ from datetime import datetime
 
 class User(object):
 	unknown = 1
+	email_counter = 0
 	person_record_type_id = '0121t0000005hIfAAI' # prod_person_account_id
 
 	def __init__(self, *args):
 		self.id = args[0]['id']
 		self.country = args[0]['countryname'] 
-		self.email = args[0]['email']
+		User.email_counter += 1
+		email = args[0]['email']
+		self.email = f'{User.email_counter}_{email}'
 		self.created = self.process_date(args[0]['created_at'])
 		self.updated = self.process_date(args[0]['updated_at'])
 		self.deleted = self.process_date(args[0]['deleted_at'])
 		self.stripe_customer = args[0]['stripe_customer_id']
 		self.name = args[0]['name']
 		self.phone = args[0]['phone_number']
+		if not self.phone or 'NULL' in self.phone:
+			self.phone = '00000000'
 		self.person_city = args[0]['personcity']
 		self.address = args[0]['address']
 		self.address_city = args[0]['addresscity']
@@ -49,7 +54,7 @@ class User(object):
 
 def main():
 	users = []
-	with open(os.path.join(os.path.dirname(__file__), 'usersFromDb.csv'), mode='r') as fread:
+	with open(os.path.join(os.path.dirname(__file__), 'delta.csv'), mode='r') as fread:
 		raw = csv.DictReader(fread)
 
 		for row in raw:
@@ -60,7 +65,7 @@ def main():
 	users_dict = [user.__dict__ for user in users]
 
 
-	with open(os.path.join(os.path.dirname(__file__),'usersProcessed.csv'), mode='w') as fwrite:
+	with open(os.path.join(os.path.dirname(__file__),'deltaProcessed.csv'), mode='w') as fwrite:
 		fields = users[0].__dict__.keys()
 		writer = csv.DictWriter(fwrite, users[0].__dict__.keys())
 		writer.writeheader()
@@ -81,5 +86,40 @@ def process_extract():
 			for row in raw:
 				writer.writerow(dict(ID=row['ID'], MIGRATION_ID__C=int(float(row["MIGRATION_ID__C"]))))
 
+def comparator():
+	first_lines = set()
+	second_lines = set()
+
+	with open(os.path.join(os.path.dirname(__file__),'usersProcessed.csv'), mode='r') as first:
+		for i in first.readlines():
+			first_lines.add(i.split(',')[0])
+
+	with open(os.path.join(os.path.dirname(__file__),'newUsersProcessed.csv'), mode='r') as second:
+		for i in second.readlines():
+			second_lines.add(i.split(',')[0])
+
+	for l in list(second_lines - first_lines):
+		print(l)
+
+def map_magento_id_to_email():
+	email_id_map = dict()
+
+	with open(os.path.join(os.path.dirname(__file__),'emailtomigrationId.csv'), mode='r') as f:
+		reader = csv.DictReader(f)
+
+		for r in reader:
+			email_id_map[int(r['id'])] = r['email']
+
+	with open(os.path.join(os.path.dirname(__file__),'magentoidtomigrationid.csv'), mode='r') as f:
+		reader = csv.DictReader(f)
+
+		with open(os.path.join(os.path.dirname(__file__),'sf_id_email_map.csv'), mode='w') as fr:
+			writer = csv.DictWriter(fr, ['Id', 'Email'])
+			writer.writeheader()
+
+			for r in reader:
+				new_row = dict(Id=r['ID'], Email=email_id_map[int(float(r['MIGRATION_ID__C']))])
+				writer.writerow(new_row)
+
 if __name__ == '__main__':
-	main()
+	map_magento_id_to_email()

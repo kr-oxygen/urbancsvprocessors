@@ -1,6 +1,7 @@
 #Mapping values
-#Mon Mar 11 10:53:03 EET 2019
+#Tue Mar 26 23:42:03 EET 2019
 producer=Name
+MagentoId=Magento_Id__c
 district=Region__c
 country=Country__c
 id=Migration_Id__c

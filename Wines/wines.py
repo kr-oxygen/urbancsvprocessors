@@ -1,5 +1,6 @@
 import csv
 import os
+import json
 
 def errors():
 	with open(os.path.join(os.path.dirname(__file__),'error030719081755151 Wines Load1.csv'), mode='r', encoding='utf-8', errors='ignore') as f:
@@ -25,12 +26,27 @@ def map_producer_ids_from_sf():
 		producer_reader = csv.DictReader(producers)
 		producsers_map = dict((row['MIGRATION_ID__C'], row['ID']) for row in producer_reader)
 
-		with open(os.path.join(os.path.dirname(__file__),'wines_new.csv'), mode='r') as wines:
+		prod_mag_map = dict()
+
+		with open('/Users/roman/Downloads/Wines.json', mode='r') as js:
+			data = json.load(js)
+
+			for d in data:
+				prod_mag_map[d['label']] = d['value']
+
+		# with open('/Users/roman/Downloads/Wines.json', mode='r') as wines_with_magento_id:
+		# 	pwmir = csv.DictReader(wines_with_magento_id)
+
+		# 	for r in pwmir:
+		# 		prod_mag_map[r['Id']] = r['MagentoId']
+
+		with open(os.path.join(os.path.dirname(__file__),'wines_new_2.csv'), mode='r') as wines:
 			wines_reader = csv.DictReader(wines, delimiter='\t')
 
 			with open(os.path.join(os.path.dirname(__file__),'wineswithproducers.csv'), mode='w') as wines_with_producers:
 				columns = wines_reader.fieldnames.copy()
 				columns.append('PRODUCER_SALESFORCE_ID')
+				columns.append('Magento_Id')
 				
 				writer = csv.DictWriter(wines_with_producers, columns)
 				
@@ -47,7 +63,11 @@ def map_producer_ids_from_sf():
 						else:
 							new_row = dict(wine.items())
 							new_row['PRODUCER_SALESFORCE_ID'] = sf_producer_id
-
+							
+							try:
+								new_row['Magento_Id'] = prod_mag_map[wine['Name']]
+							except:
+								print(wine['Name'])
 							writer.writerow(new_row)
 
 def process_errors():

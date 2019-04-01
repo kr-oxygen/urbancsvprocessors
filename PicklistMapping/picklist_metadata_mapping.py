@@ -32,8 +32,10 @@ def generate_metadata(picklist_name, picklist_value, magento_id):
 		.replace("ü", "u") \
 		.replace("'", "_")
 
+	picklist_value_formatted = picklist_value_formatted[:picklist_value_formatted.index('_ml_(')]
+
 	generated_value = metadata_template.substitute(
-		label=f'{picklist_name_formatted}_{picklist_value}',
+		label=f'{picklist_name_formatted}_{picklist_value}'[:40],
 		magento_id=magento_id, 
 		picklist_mapping=picklist_name_formatted, 
 		salesforce_value=picklist_value)
@@ -64,4 +66,4 @@ def main(picklist_name, magento_mapping_file_path, output_directory):
 
 
 if __name__ == '__main__':
-	main('Region__c', '/Users/roman/Programing/python/uwbcsv/CountriesWithRegions/RegionsWithMagentoIds.json', os.path.dirname(__file__))
+	main('Bottle_Content_Size__c', '/Users/roman/Downloads/bottle size.json', os.path.dirname(__file__))
