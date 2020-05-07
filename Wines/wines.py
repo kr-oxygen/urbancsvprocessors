@@ -2,6 +2,18 @@ import csv
 import os
 import json
 
+def update_full_name():
+	with open(os.path.join(os.path.dirname(__file__),'wines.csv'), mode='r', encoding='utf-8', errors='ignore') as wines:
+		reader = csv.DictReader(wines)
+		with open(os.path.join(os.path.dirname(__file__),'winesToUpdate.csv'), mode='w') as to_update:
+				writer = csv.DictWriter(to_update, ['Id', 'CombinedName'])
+				writer.writeheader()
+
+				for line in reader:
+					combined_name = f'{line["Name"]} {line["Producer_Name__c"]}'
+					new_line = dict(Id=line['Id'], CombinedName=combined_name)
+					writer.writerow(new_line)
+
 def errors():
 	with open(os.path.join(os.path.dirname(__file__),'error030719081755151 Wines Load1.csv'), mode='r', encoding='utf-8', errors='ignore') as f:
 		reader = csv.DictReader(f)
@@ -22,13 +34,13 @@ def errors():
 		print(f'Not Restricted errors number is {other_errors}')
 
 def map_producer_ids_from_sf():
-	with open(os.path.abspath(os.path.join('Producers', 'producersids.csv')), mode='r') as producers:
+	with open(os.path.abspath(os.path.join('Producers', 'producersWithMagentoAndSfIds.csv')), mode='r') as producers:
 		producer_reader = csv.DictReader(producers)
 		producsers_map = dict((row['MIGRATION_ID__C'], row['ID']) for row in producer_reader)
 
 		prod_mag_map = dict()
 
-		with open('/Users/roman/Downloads/Wines.json', mode='r') as js:
+		with open(os.path.join(os.path.dirname(__file__),'magentoWinesIds.json'), mode='r') as js:
 			data = json.load(js)
 
 			for d in data:
@@ -66,9 +78,9 @@ def map_producer_ids_from_sf():
 							
 							try:
 								new_row['Magento_Id'] = prod_mag_map[wine['Name']]
+								writer.writerow(new_row)
 							except:
 								print(wine['Name'])
-							writer.writerow(new_row)
 
 def process_errors():
 	with open(os.path.join(os.path.dirname(__file__),'error031119094053007.csv'), mode='r') as errors_file:
@@ -101,5 +113,27 @@ def error_records():
 
 		print(','.join(ids))
 
+def wines_without_magento_id():
+	wines_dict = dict()
+
+	with open('/Users/roman/Downloads/wines.csv', mode='r') as wines:
+		wines_reader = csv.DictReader(wines)
+
+		for wine in wines_reader:
+			if wine['value'] not in wines_dict.keys():
+				wines_dict[wine['value']] = list()
+				
+			wines_dict[wine['value']].append(wine['option_id'])
+
+	for k, v in wines_dict.items():
+		if len(v) > 1:
+			print(k, max(v))
+		else:
+			print(k, v)
+
+
+
 if __name__ == '__main__':
-	map_producer_ids_from_sf()
+	# map_producer_ids_from_sf()
+	# wines_without_magento_id()
+	update_full_name()

@@ -1,0 +1,8 @@
+#Mapping values
+#Wed May 06 10:09:30 EEST 2020
+deleted=Deleted_Date__c
+incoming=Income_Date__c
+handout=Hand_Out_Date__c
+warehoused=Warehoused_Date__c
+external=External_Date__c
+id=Id

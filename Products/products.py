@@ -1,12 +1,13 @@
 import csv
 import os
+import re
 
 bottle_record_type_id = '0121t0000005h6JAAQ'
 
 def get_wines():
 	wine_id_to_wine_object_dict = dict()
 
-	with open(os.path.abspath(os.path.join('Wines', 'wineswithproducers.csv')), mode='r', encoding='utf-8') as wines:
+	with open(os.path.abspath(os.path.join('Wines', 'wineswithoutproducersFromSf.csv')), mode='r', encoding='utf-8') as wines:
 		wines_reader = csv.DictReader(wines)
 
 		for wine in wines_reader:
@@ -34,15 +35,15 @@ def get_bottle_unique_name(wine_id_to_wine_object_dict, bottle_row):
 
 def fill_products_with_sf_ids():
 	warehouse_id = None
-	# cells_dict = dict()
+	cells_dict = dict()
 
-	# with open(os.path.abspath(os.path.join('WineCellarLocations', 'cellswithids.csv')), mode='r', encoding='utf-8') as cells:
-	# 	cells_reader = csv.DictReader(cells)
+	with open(os.path.abspath(os.path.join('WineCellarLocations', 'cellswithids.csv')), mode='r', encoding='utf-8') as cells:
+		cells_reader = csv.DictReader(cells)
 
-	# 	for cell in cells_reader:
-	# 		cells_dict[cell['NAME']] = cell['ID']
-	# 		if not warehouse_id:
-	# 			warehouse_id = cell['WAREHOUSE__C']
+		for cell in cells_reader:
+			cells_dict[cell['NAME']] = cell['ID']
+			if not warehouse_id:
+				warehouse_id = cell['WAREHOUSE__C']
 	
 	photos_dict = dict()
 
@@ -70,7 +71,7 @@ def fill_products_with_sf_ids():
 
 	errors = dict(Wines=dict(),Cells=dict(),Accounts=dict())
 
-	with open(os.path.join(os.path.dirname(__file__), 'products_delta.csv'), mode='r', encoding='utf-8') as products:
+	with open(os.path.join(os.path.dirname(__file__), 'products_new_2 (2).csv'), mode='r', encoding='utf-8') as products:
 		reader = csv.DictReader(products, delimiter='\t')
 		fields = set(reader.fieldnames)
 		fields.update(['SFWarehouseId', 'SFWarehouseCellId', 'SFMainPhotoId', 'SFAccountId', 'SFWineId', 'SFProducerId', 'RecordTypeId'])
@@ -94,22 +95,23 @@ def fill_products_with_sf_ids():
 				if not wine:
 					errors['Wines'][bottle["WineId"]] = bottle["Id"]
 					# print(f'ALERT!!! WINE: {bottle["Id"]}, wineId: {bottle["WineId"]}')
+					continue
 				else:
 					new_bottle['SFWineId'] = wine['ID']
 					new_bottle['SFProducerId'] = wine['PRODUCER__C']
 
 				# obtainig cellar location details
-				# cell_name = bottle['WarehouseCellLocationName']
+				cell_name = bottle['WarehouseCellLocationName']
 				
-				# if bottle['Status'] == 'Warehoused' and cell_name:
-				# 	cell = cells_dict.get(cell_name, None)
+				if bottle['Status'] == 'Warehoused' and cell_name:
+					cell = cells_dict.get(cell_name, None)
 
-				# 	if not cell:
-				# 		errors['Cells'][cell_name] = (bottle["Id"],bottle["Status"])
-				# 		# print(f'ALERT!!! CELL: {bottle["Id"]}, cell: {cell_name}')
-				# 	else:
-				# 		new_bottle['SFWarehouseId'] = warehouse_id
-				# 		new_bottle['SFWarehouseCellId'] = cell
+					if not cell:
+						errors['Cells'][cell_name] = (bottle["Id"],bottle["Status"])
+						# print(f'ALERT!!! CELL: {bottle["Id"]}, cell: {cell_name}')
+					else:
+						new_bottle['SFWarehouseId'] = warehouse_id
+						new_bottle['SFWarehouseCellId'] = cell
 
 				# obtaining account details
 				account = accounts_dict.get(bottle['AccountId'], None)
@@ -139,6 +141,9 @@ def fill_products_with_sf_ids():
 				new_bottle['RecordTypeId'] = bottle_record_type_id
 				writer.writerow(new_bottle)
 				counter += 1
+				
+				if counter == 3000:
+					break
 
 			print(counter)
 
@@ -431,7 +436,258 @@ def add_bracketes_to_products():
 	# 			print(f'count_with_brackets: {count_with_brackets}')
 	# 			print(f'count_without_brackets: {count_without_brackets}')
 
+def match_products_with_photo():
+	ids_map = dict()
+
+	with open(os.path.join(os.path.dirname(__file__), 'products_delta_brackets.csv'), mode='r') as items:
+		reader = csv.DictReader(items, delimiter='\t')
+
+		for item in reader:
+			ids_map[item['Id']] = item
+
+	with open(os.path.join(os.path.dirname(__file__), 'magnumAndHalfWithCorrectYear.csv'), mode='r') as items:
+		reader = csv.DictReader(items)
+
+		counter = 0
+		counter_with_photo = 0
+
+		item_to_photo_map = dict()
+		item_with_photo_map = dict()
+		items_without_photo = list()
+
+		for item in reader:
+			id_photo = ids_map.get(item['MIGRATION_ID__C'], None)
+
+			counter += 1
+
+			if not id_photo:
+				items_without_photo.append(item)
+			else:
+				counter_with_photo += 1
+				photos = item_to_photo_map.get(item['PRODUCT_PHOTO_UNIQUE_NAME__C'], None)
+				if not photos:
+					item_to_photo_map[item['PRODUCT_PHOTO_UNIQUE_NAME__C']] = set()
+				
+				item_to_photo_map[item['PRODUCT_PHOTO_UNIQUE_NAME__C']].add(id_photo['PhotoLink'])
+				
+				items_with_photos = item_with_photo_map.get(item['PRODUCT_PHOTO_UNIQUE_NAME__C'], list())
+				
+				if len(items_with_photos) == 0:
+					item_with_photo_map[item['PRODUCT_PHOTO_UNIQUE_NAME__C']] = items_with_photos
+
+				items_with_photos.append(item)
+				# item_with_photo_map[item['PRODUCT_PHOTO_UNIQUE_NAME__C']] = item
+
+		for k, v in item_to_photo_map.items():
+			if len(v) > 1:
+				print(k)
+				for photo in v:
+					print(photo)
+
+		without_photo_counter = 0
+		with_photo_counter = 0
+
+		for item in items_without_photo:
+			items_with_photos = item_with_photo_map.get(item['PRODUCT_PHOTO_UNIQUE_NAME__C'], None)
+
+			if items_with_photos:
+				items_with_photos.append(item)
+				with_photo_counter += 1
+			else:
+				without_photo_counter += 1
+
+		print(f'counter: {counter}')
+		print(f'counter_with_photo: {counter_with_photo}')
+		print(f'len(item_with_photo_map): {len(item_with_photo_map)}')
+		print(f'with_photo_counter: {with_photo_counter}')
+		print(f'without_photo_counter: {without_photo_counter}')
+
+		overall_counter = 0
+
+		with open(os.path.join(os.path.dirname(__file__), 'magnumAndHalfWithCorrectYearPhotoMap.csv'), mode='w') as matched:
+			writer_fields = list(reader.fieldnames)
+			writer_fields.append('PhotoLink')
+			writer = csv.DictWriter(matched, writer_fields)
+
+			writer.writeheader()
+
+			for k,v in item_with_photo_map.items():
+				for item in v:
+					new_row = dict(item)
+					new_row['PhotoLink'] = list(item_to_photo_map[item['PRODUCT_PHOTO_UNIQUE_NAME__C']])[0]
+					writer.writerow(new_row)
+
+		# print(f'overall_counter: {overall_counter}')
+
+def change_photo_unique_name_to_15_chars():
+	pattern = '^([a-zA-Z0-9]{18})-([a-zA-Z0-9]{18})(-.+)$'
+
+	with open(os.path.abspath(os.path.join('Photos', 'photosToUpdateProd.csv')), mode='r') as old_photos:
+		with open(os.path.abspath(os.path.join('Photos', 'photosToUpdateProdChanged.csv')), mode='w') as new_photos:
+
+			reader = csv.DictReader(old_photos)
+			writer = csv.DictWriter(new_photos, reader.fieldnames)
 			
+			writer.writeheader()
+
+			for photo in reader:
+				m = re.search(pattern, photo['PHOTO_UNIQUE_NAME__C'])
+
+				if m:
+					new_name = f'{m.group(1)[:15]}-{m.group(2)[:15]}{m.group(3)}'
+					new_photo = dict(photo)
+					new_photo['PHOTO_UNIQUE_NAME__C'] = new_name
+					writer.writerow(new_photo)
+
+def compare_photo_and_products():
+	photos = dict()
+
+	with open(os.path.abspath(os.path.join('Photos', 'photosToUpdateProdChanged.csv')), mode='r') as new_photos:
+		reader = csv.DictReader(new_photos)
+
+		for photo in reader:
+			photos[photo['ID']] = photo['PHOTO_UNIQUE_NAME__C']
+	
+	with open(os.path.abspath(os.path.join('Photos', 'productsWithPhotos.csv')), mode='r') as products:
+		reader = csv.DictReader(products)
+
+		for product in reader:
+			photo = photos.get(product['MAIN_PHOTO__C'], None)
+			if photo:
+				if photos[product['MAIN_PHOTO__C']] != product['PRODUCT_PHOTO_UNIQUE_NAME__C']:
+					print(f'{product["ID"]}, {photos[product["MAIN_PHOTO__C"]]}, {product["PRODUCT_PHOTO_UNIQUE_NAME__C"]}')
+
+			else:
+				print(product["PRODUCT_PHOTO_UNIQUE_NAME__C"])
+
+
+
+
+def process_products_photos():
+	products_with_photos = dict()
+
+	with open(os.path.join(os.path.dirname(__file__), 'productsWithPhotosFromProd.csv'), mode='r') as products:
+		reader = csv.DictReader(products)
+
+		for product in reader:
+			main_photo = product['MAIN_PHOTO__C']
+
+			if main_photo:
+				if not main_photo in products_with_photos:
+					products_with_photos[main_photo] = dict()
+				products_with_photos[main_photo][product['PRODUCT_PHOTO_UNIQUE_NAME__C']] = product
+
+	wines_dict = dict()
+
+	with open(os.path.abspath(os.path.join('Wines', 'winesWithProducersFromProd.csv')), mode='r') as wines:
+		reader = csv.DictReader(wines)
+
+		for wine in reader:
+			key = f'{wine["NAME"]}+{wine["PRODUCER_NAME__C"]}'
+			if key in wines_dict:
+				print(f'{key} is there')
+			else:
+				wines_dict[key] = wine
+
+	with open(os.path.abspath(os.path.join('Photos', 'photosFromProd.csv')), mode='r') as photos:
+		with open(os.path.abspath(os.path.join('Photos', 'productsWithPhotosFromProdChangedPhotoName.csv')), mode='w') as photosChanged:
+			reader = csv.DictReader(photos)
+			writer = csv.DictWriter(photosChanged, reader.fieldnames)
+			writer.writeheader()
+			
+			with open(os.path.join(os.path.dirname(__file__), 'photosWithoutProducts.csv'), mode='w') as errors:
+				errors_writer = csv.DictWriter(errors, reader.fieldnames)
+				errors_writer.writeheader()
+
+				for photo in reader:
+					photo_unique_name = photo['PHOTO_UNIQUE_NAME__C']
+					photo_product_without_brackets = photo_unique_name.endswith('-1')
+
+					products_dict = products_with_photos.get(photo['ID'], None)
+
+					new_photo_name = None
+
+					m = None
+					if photo_product_without_brackets:
+						m = re.search('(.+)-(.+)(-.+-.+-.+-.+-.+-.+)', photo_unique_name)
+					else:
+						m = re.search('(.+)-(.+)(-.+-.+-.+-.+-.+-.+-.+)', photo_unique_name)
+
+					if not products_dict and m:
+						key = f'{m.group(1)}+{m.group(2)}'
+						wine = wines_dict.get(key, None)
+
+						if wine:
+							new_photo_name = f'{wine["ID"]}-{wine["PRODUCER__C"]}{m.group(3)}'
+					elif m:
+						product = list(products_dict.values())[0]
+						new_photo_name = f'{product["WINE__C"]}-{product["PRODUCER__C"]}{m.group(3)}'
+
+					if not new_photo_name:
+						errors_writer.writerow(photo)
+					else:
+						new_photo = dict(photo)
+						new_photo['PHOTO_UNIQUE_NAME__C'] = new_photo_name
+						writer.writerow(new_photo)
+
+	# for photoKey, productDict in products_with_photos.items():
+	# 	if len(productDict) > 1:
+	# 		for k, v in productDict.items():
+	# 			print(v)
+
+def process_photos_without_products():
+	wines_dict = dict()
+
+	with open(os.path.abspath(os.path.join('Wines', 'winesWithProducersFromProd.csv')), mode='r') as wines:
+		reader = csv.DictReader(wines)
+
+		for wine in reader:
+			key = f'{wine["NAME"]}+{wine["PRODUCER_NAME__C"]}'
+			if key in wines_dict:
+				print(f'{key} is there')
+			else:
+				wines_dict[key] = wine
+
+	with open(os.path.join(os.path.dirname(__file__), 'photosWithoutProducts.csv'), mode='r') as errors:
+		reader = csv.DictReader(errors)
+
+		for photo in reader:
+			m = re.search('(.+)-(.+)-.+-.+-.+-.+-.+-.+', photo['PHOTO_UNIQUE_NAME__C'])
+			key = f'{m.group(1)}+{m.group(2)}'
+			wine = wines_dict.get(key, None)
+			if not wine:
+				print(photo['ID'])
+			else:
+				pass
+
+def compare_sf_and_magento_products():
+	sf_products = dict()
+
+	with open('/Users/roman/Downloads/SoqlQueryResult.csv', mode='r') as sf:
+		sf_reader = csv.DictReader(sf)
+
+		for prod in sf_reader:
+			sf_products[str(int(float(prod['Magento_Id__c'])))] = prod
+	
+	with open('/Users/roman/Downloads/products -bottles - box - 4328.csv', mode='r') as magento:
+		reader = csv.DictReader(magento)
+		
+		with open('/Users/roman/Downloads/diff_user1.csv', mode='w') as diff:
+			writer = csv.DictWriter(diff, ['sf_id','magento_id','sf_count', 'magento_count', 'status'])
+			writer.writeheader()
+
+			for prod in reader:
+				sf_prod = sf_products.get(prod['product_id'], None)
+
+				if not sf_prod:
+					print(f'sf does not exist for the {prod}')
+					continue
+
+				if float(sf_prod['Bottles_Count__c']) != float(prod['bottles_count']) or sf_prod['Status__c'] != 'Warehoused':
+					writer.writerow(dict(sf_id=sf_prod['Id'],magento_id=prod['product_id'],sf_count=sf_prod['Bottles_Count__c'], magento_count=prod['bottles_count'], status=sf_prod['Status__c']))
+					print(f"{sf_prod['Id']}, {prod['product_id']}, {sf_prod['Bottles_Count__c']}, {prod['bottles_count']}, {sf_prod['Status__c']}")
+
+
 
 
 if __name__ == '__main__':
@@ -444,5 +700,14 @@ if __name__ == '__main__':
 	# fill_products_with_cells()
 	# match_products_to_photos()
 	# count_products()
-	add_bracketes_to_products()
-	
+	# add_bracketes_to_products()
+	# match_products_with_photo()
+	# process_products_photos()
+
+	# process_photos_without_products()
+
+	# change_photo_unique_name_to_15_chars()
+
+	# compare_photo_and_products()
+
+	compare_sf_and_magento_products()
