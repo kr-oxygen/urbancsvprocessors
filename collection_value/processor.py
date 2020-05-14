@@ -1,18 +1,24 @@
 import csv
+import math
 import os
 import datetime
+from dateutil import tz
+from dateutil.parser import parse
+import pytz
+import json
+
 
 class ProductToMigrate(object):
-	def __init__(self, product):
-		self.id = product['Id']
-		self.created_date = product['CreatedDate']
-		self.current_status = product['Status__c']
-		self.migration = product['Migration_Id__c']
-		self.incoming = None
-		self.warehoused = None
-		self.external = None
-		self.deleted = None
-		self.hand_out = None
+	def __init__(self, product=None, c=None):
+		self.id = product['Id'] if product else c['id']
+		self.created_date = product['CreatedDate'] if product else None
+		self.current_status = product['Status__c'] if product else None
+		self.migration = product['Migration_Id__c'] if product else None
+		self.incoming = None if not c else c['incoming']
+		self.warehoused = None if not c else c['warehoused']
+		self.external = None if not c else c['external']
+		self.deleted = None if not c else c['deleted']
+		self.hand_out = None if not c else c['handout']
 
 	def set_incoming(self, date):
 		self.incoming = date
@@ -70,10 +76,23 @@ class ProductToMigrate(object):
 			migration=self.migration if self.migration else '',
 			status=self.current_status)
 
+	def __str__(self):
+		return json.dumps(self.get_dict(), skipkeys=True)
+
+	not_equal = list()
+
+	def compare(self, other):
+		if self.incoming != other.incoming or self.warehoused != other.warehoused or self.external != other.external or self.deleted != other.deleted or self.hand_out != other.hand_out:
+			print(f'{self}\n{other}')
+			print('---------------------------------------------------------------------------------------------------')
+			ProductToMigrate.not_equal.append(self)
+
+
+
 def migrate_product_status_changes():
 	products_map = dict()
 
-	with open(os.path.join(os.path.dirname(__file__), 'products') + '.csv', mode='r') as file:
+	with open(os.path.join(os.path.dirname(__file__), 'products_to_migrate') + '.csv', mode='r') as file:
 		raw = csv.DictReader(file)
 
 		for row in raw:
@@ -82,7 +101,6 @@ def migrate_product_status_changes():
 	with open(os.path.join(os.path.dirname(__file__), 'products_hist') + '.csv', mode='r') as file:
 		raw = csv.DictReader(file)
 
-		
 		for row in raw:
 			id = row['ParentId']
 			status = row['NewValue']
@@ -102,8 +120,8 @@ def migrate_product_status_changes():
 				elif status == 'Handed out':
 					product.set_hand_out(date)
 
-	with open(os.path.join(os.path.dirname(__file__), 'products_migrated_status') + '.csv', mode='w') as file:
-		writter = csv.DictWriter(file, 
+	with open(os.path.join(os.path.dirname(__file__), 'products_migrated_status1') + '.csv', mode='w') as file:
+		writer = csv.DictWriter(file,
 			[
 				'id', 
 				'incoming', 
@@ -117,22 +135,69 @@ def migrate_product_status_changes():
 			]
 		)
 
-		writter.writeheader()
+		writer.writeheader()
 
 		for product in products_map.values():
-			writter.writerow(product.get_dict())
+			writer.writerow(product.get_dict())
+
+
+def compare_migrated_histories():
+	old_map = dict()
+
+	with open(os.path.join(os.path.dirname(__file__), 'products_migrated_status') + '.csv', mode='r') as file:
+		raw = csv.DictReader(file)
+		for row in raw:
+			old_map[row['id']] = ProductToMigrate(None,row)
+
+	with open(os.path.join(os.path.dirname(__file__), 'products_migrated_status1') + '.csv', mode='r') as file:
+		raw = csv.DictReader(file)
+		for row in raw:
+			new = ProductToMigrate(None,row)
+			old = old_map.get(new.id, None)
+
+			if old:
+				new.compare(old)
+
+	print(len(ProductToMigrate.not_equal))
+	print(','.join(map(lambda x: f"'{x.id}'", ProductToMigrate.not_equal)))
+
+
+
+def to_datetime(str_value):
+	if not str_value:
+		return None
+
+	sf = parse(str_value)
+	sf_repl = sf.replace(tzinfo=pytz.UTC)
+	local = sf_repl.astimezone(tz.tzlocal())
+
+	return local
+
 
 def to_date(str_value):
 	if not str_value:
 		return None
 
-	dt = datetime.datetime.strptime(str_value[:-5], '%Y-%m-%dT%H:%M:%S.%f')
+	sf = parse(str_value)
+	sf_repl = sf.replace(tzinfo=pytz.UTC)
+	local = sf_repl.astimezone(tz.tzlocal())
 
-	return dt.date()
+	return local.date()
+	#
+	# dt = datetime.datetime.strptime(str_value[:-5], '%Y-%m-%dT%H:%M:%S.%f')
+	#
+	# return dt.date()
+
+
+def round_price(price):
+	price = round(price, 2) # (math.ceil(price*100))/100
+
+	return price if isinstance(price, float) and not price.is_integer() else int(price)
 
 
 class ProductStatus(object):
 	absent = None
+	incoming = 'Incoming'
 	warehoused = 'Warehoused'
 	external = 'External'
 	deleted = 'Deleted'
@@ -140,18 +205,18 @@ class ProductStatus(object):
 
 
 class TestProduct(object):
-	def __init__(self, warehosed=None, external=None, deleted=None, hand_out=None):
-		self.warehoused = warehosed
+	def __init__(self, warehoused=None, external=None, deleted=None, hand_out=None):
+		self.warehoused = warehoused
 		self.external = external
 		self.deleted = deleted
 		self.hand_out = hand_out
 
 
-class TestOrder(object):
-	def __init__(self, date):
-		self.date = date
-		self.buyer = f'{date} buyer'
-		self.seller = f'{date} seller'
+# class TestOrder(object):
+# 	def __init__(self, date):
+# 		self.date = date
+# 		self.buyer = f'{date} buyer'
+# 		self.seller = f'{date} seller'
 
 
 class Order(object):
@@ -164,32 +229,43 @@ class Order(object):
 		self.seller = csv['Seller__c']  if csv else test.seller
 
 
+class StatusDate(object):
+	def __init__(self, status, datetime):
+		self.status = status
+		self.datetime = datetime
+		self.date = datetime.date()
+
+
 class Product(object):
+	products_with_final_account_does_not_match_last_buyer = set()
+
 	def __init__(self, csv=None, test=None):
 		self.id = csv['Id'] if csv else None
 		self.hash_id = csv['Product_Wine_Hash__c'] if csv else None
-		self.bottle_content_size = csv['Bottle_Content_Size__c'] if csv else None
-		self.bottles_count = csv['Bottles_Count__c'] if csv else None
+		size = csv['Bottle_Content_Size__c'].split(' ')[0] if csv else None
+		self.bottle_content_size = int(size) if size and size != 'Odd' else 0
+		self.bottles_count = int(csv['Bottles_Count__c']) if csv else None
 		self.final_account = csv['Account__c'] if csv else None
 		self.final_status = csv['Status__c'] if csv else None
 		self.final_price = csv['Actual_Price__c'] if csv else None
-		self.created_date = to_date(csv['CreatedDate']) if csv else None
-		self.warehoused = to_date(csv['Warehoused_Date__c']) if csv else test.warehoused
-		self.external = to_date(csv['External_Date__c']) if csv else test.external
-		self.deleted = to_date(csv['Deleted_Date__c']) if csv else test.deleted
-		self.hand_out = to_date(csv['Hand_Out_Date__c']) if csv else test.hand_out
+		self.created_date = to_datetime(csv['CreatedDate']) if csv else None
+		self.incoming = to_datetime(csv['Income_Date__c']) if csv else None
+		self.warehoused = to_datetime(csv['Warehoused_Date__c']) if csv else test.warehoused
+		self.external = to_datetime(csv['External_Date__c']) if csv else test.external
+		self.deleted = to_datetime(csv['Deleted_Date__c']) if csv else test.deleted
+		self.hand_out = to_datetime(csv['Hand_Out_Date__c']) if csv else test.hand_out
 		self.orders = list()
-		self.points_set = set(self._get_time_points())
+		self.status_points = self._get_time_points()
+		self.points_set = set(map(lambda x: x.date, self.status_points))
+		self.hash = None
 		# self.all_points_set = set(self.points_set)
 
 	def add_hash(self, hash):
 		self.hash = hash
 
-
 	def add_order_info(self, order):
 		self.orders.append(order)
 		# self.points_set.add(order.date)
-
 
 	def get_account_at_time_point(self, point):
 		if not hasattr(self, 'sorted'):
@@ -197,8 +273,9 @@ class Product(object):
 			self.orders.sort(key=lambda i: i.date)
 
 		if len(self.orders) == 0 or point >= self.orders[-1].date:
-			if len(self.orders) > 0 and not self.orders[-1].buyer == self.final_account:
-				print(f'ALERT: final account does not mach last order buyer')
+			if len(self.orders) > 0 and self.orders[-1].buyer != self.final_account:
+				# print(f'ALERT: final account {self.final_account} does not mach last order buyer {self.orders[-1].buyer}')
+				Product.products_with_final_account_does_not_match_last_buyer.add(self)
 
 			return self.final_account
 
@@ -207,59 +284,88 @@ class Product(object):
 
 		return next(iter([order.buyer for order in reversed(self.orders) if order.date <= point]))
 
-
 	def get_status_at_time_point(self, point):
-		if not self.warehoused and not self.external:
-			if self.deleted:
-				return ProductStatus.deleted
-			
-			return ProductStatus.hand_out
+		# if not self.warehoused and not self.external:
+		# 	if self.deleted:
+		# 		return ProductStatus.deleted
+		#
+		# 	return ProductStatus.hand_out
+		#
+		# if self.warehoused:
+		# 	if point < self.warehoused:
+		# 		return ProductStatus.absent
+		# 	if self.hand_out:
+		# 		if point >= self.hand_out:
+		# 			return ProductStatus.hand_out
+		#
+		# 	return ProductStatus.warehoused
+		#
+		# if self.external:
+		# 	if point < self.external:
+		# 		return ProductStatus.absent
+		# 	if self.deleted:
+		# 		if point >= self.deleted:
+		# 			return ProductStatus.deleted
+		#
+		# 	return ProductStatus.external
+		#
+		# return ProductStatus.absent
+		if len(self.status_points) == 0 or point < self.status_points[0].date:
+			return ProductStatus.absent
 
-		if self.warehoused:
-			if point < self.warehoused:
-				return ProductStatus.absent
-			if self.hand_out:
-				if point >= self.hand_out:
-					return ProductStatus.hand_out
+		if point >= self.status_points[-1].date:
+			return self.status_points[-1].status
 
-			return ProductStatus.warehoused
-		
-		if self.external:
-			if point < self.external:
-				return ProductStatus.absent
-			if self.deleted:
-				if point >= self.deleted:
-					return ProductStatus.deleted
+		return next(iter([item.status for item in reversed(self.status_points) if item.date <= point]))
 
-			return ProductStatus.external
+	def get_price_at_time_point(self, point):
+		if not self.hash:
+			return 0
 
-		return ProductStatus.absent
+		hash_price = self.hash.get_price_at_time_point(point)
+
+		price = (hash_price / (750 / self.bottle_content_size)) * self.bottles_count
+		price = round_price(price)
+
+		return price
 
 	def _get_time_points(self):
-		points = list()
+		points_map = dict()
 
 		if self.warehoused:
-			points.append(self.warehoused)
+			Product._add_to_points_map(points_map, StatusDate(ProductStatus.warehoused, self.warehoused))
 		
 		if self.hand_out:
-			points.append(self.hand_out)
+			Product._add_to_points_map(points_map, StatusDate(ProductStatus.hand_out, self.hand_out))
 		
 		if self.external:
-			points.append(self.external)
+			Product._add_to_points_map(points_map, StatusDate(ProductStatus.external, self.external))
 		
 		if self.deleted:
-			points.append(self.deleted)
+			Product._add_to_points_map(points_map, StatusDate(ProductStatus.deleted, self.deleted))
 
-		return points
+		if self.incoming:
+			Product._add_to_points_map(points_map, StatusDate(ProductStatus.incoming, self.incoming))
+
+		return sorted(points_map.values(), key=lambda x: x.date)
+
+	@staticmethod
+	def _add_to_points_map(points_map, value):
+		item = points_map.get(value.date, None)
+
+		if not item or value.datetime > item.datetime:
+			points_map[value.date] = value
 
 
 class WinesearcherResponse(object):
 	def __init__(self, item):
+		self.id = item['Id']
 		self.date = to_date(item['CreatedDate'])
 		self.price = float(item['Price_Average__c'])
 
 	def __str__(self):
 		return f'{self.date}: {self.price}'
+
 
 class ProductWineHashHistory(object):
 	def __init__(self, item):
@@ -272,16 +378,14 @@ class ProductWineHashHistory(object):
 	def add_value(self, item):
 		wr = WinesearcherResponse(item)
 
-		if not self.current or self.current.price != wr.price:
+		if wr.price > 0 and (not self.current or self.current.price != wr.price):
 			self.history.append(wr)
 			self.current = wr
 
 		self.dates_set.add(wr.date)
 
-
 	def add_product(self, product):
 		self.products.append(product)
-
 
 	def get_price_at_time_point(self, point):
 		if not hasattr(self, 'sorted'):
@@ -299,7 +403,6 @@ class ProductWineHashHistory(object):
 		
 		return next(iter([item.price for item in reversed(self.history) if item.date <= point]))
 
-
 	def __str__(self):
 		str = f'{self.hash}\n'
 
@@ -310,13 +413,36 @@ class ProductWineHashHistory(object):
 
 
 class CollectionValue(object):
-	def __init__(self, account, date, bottles, external_bottles, value, external_value):
+	props = ['account', 'date', 'bottles', 'external_bottles', 'value', 'external_value']
+
+	def __init__(self, account, date):
 		self.account = account
 		self.date = date
-		self.bottles = bottles
-		self.external_bottles = external_bottles
-		self.value = value
-		self.external_value = external_value
+		self.bottles = 0
+		self.external_bottles = 0
+		self.value = 0
+		self.external_value = 0
+
+	def add_product(self, product, status):
+		if status == ProductStatus.warehoused:
+			self.bottles += product.bottles_count
+			self.value += product.get_price_at_time_point(self.date)
+
+			return
+		
+		if status == ProductStatus.external:
+			self.external_bottles += product.bottles_count
+			self.external_value += product.get_price_at_time_point(self.date)
+
+	def get_dict(self):
+		return dict(
+			account=self.account,
+			date=self.date,
+			bottles=self.bottles,
+			external_bottles=self.external_bottles,
+			value=round_price(self.value),
+			external_value=round_price(self.external_value)
+		)
 
 
 class Account(object):
@@ -324,7 +450,6 @@ class Account(object):
 		self.id = id
 		self.collection_values = list()
 
-	
 	def add_collection_value(self, collection_value):
 		self.collection_values.append(collection_value)
 
@@ -349,22 +474,27 @@ def get_hash_changes_map():
 def get_products_map(hash_changes_map):
 	products_map = dict()
 
-
 	with open(os.path.join(os.path.dirname(__file__), 'products') + '.csv', mode='r') as file:
 		raw = csv.DictReader(file)
+		no_match_count = 0
 
 		for row in raw:
 			id = row['Id']
 			product = Product(row)
 			products_map[id] = product
 
-			hash = hash_changes_map.get(product.hash, None)
+			hash = hash_changes_map.get(product.hash_id, None)
+
 
 			if not hash:
-				print(f'ALARM: hash is not found for Product: {product.id}')
+				# print(f'ALARM: hash is not found for Product: {product.id}')
+				no_match_count += 1
 			else:
 				hash.add_product(product)
+				hash_changes_map[product] = hash
 				product.add_hash(hash)
+
+		print(f'There are no hash matches for products, count: {no_match_count}')
 
 	return products_map
 
@@ -387,8 +517,19 @@ def fill_products_with_orders(products_map):
 			
 			dates = order_dates_map.get(order.date, list())
 			dates.append(order)
+			order_dates_map[order.date] = dates
 
 	return order_dates_map
+
+
+class BuiltCollectionValueDataHolder(object):
+	def __init__(self):
+		self.hash_changes_map = None
+		self.products_map = None
+		self.order_dates_map = None
+		self.collection_values = list()
+		self.dates_set = set()
+		self.dates_product_map = dict()
 
 
 # 1) group winesearcher responses by hash
@@ -405,56 +546,188 @@ def fill_products_with_orders(products_map):
 # 9) get accounts from products on this date
 # 10) get changed products this date
 # 11) get accounts for them
-def build_collection_history():
-	hash_changes_map = get_hash_changes_map()
-	products_map = get_products_map(hash_changes_map)
-	order_dates_map = fill_products_with_orders(products_map)
-	accounts = dict()
-	collection_values = list()
+def build_collection_value():
+	holder = BuiltCollectionValueDataHolder()
+	holder.hash_changes_map = get_hash_changes_map()
+	holder.products_map = get_products_map(holder.hash_changes_map)
+	holder.order_dates_map = fill_products_with_orders(holder.products_map)
+	holder.collection_values = list()
+	holder.dates_set = set()
+	holder.dates_product_map = dict()
 
-	dates_set = set()
-	dates_product_map = dict()
+	for hash in holder.hash_changes_map.values():
+		holder.dates_set.update(hash.dates_set)
 
-	for hash in hash_changes_map.values():
-		dates_set.update(hash.get_all_time_points())
+	holder.dates_set.update([order_date for order_date in holder.order_dates_map.keys()])
 
-	dates_set.update([order_date for order_date in order_dates_map.keys()])
-
-	for product in products_map.values():
+	for product in holder.products_map.values():
 		for point in product.points_set:
-			products = dates_product_map.get(point, list())
+			products = holder.dates_product_map.get(point, list())
 			products.append(product)
+			holder.dates_product_map[point] = products
 
-		dates_set.update(product.points_set)
+		holder.dates_set.update(product.points_set)
 
-	for date in dates_set:
+	return holder
+
+
+def test_built_collection(product, date):
+	holder = build_collection_value()
+
+	if date in holder.dates_set:
+		print('Date in set')
+	else:
+		print('Date not in set')
+
+	product = holder.products_map[product]
+	account_at_time = product.get_account_at_time_point(date)
+
+	print(f'Account at time: {account_at_time}')
+
+	print(f'Price at time: {product.get_price_at_time_point(date)}')
+
+
+def test_get_products_by_account_for_day(account, date):
+	holder = build_collection_value()
+
+	with open(os.path.join(os.path.dirname(__file__), f'products_for_account') + '.csv', mode='w') as file:
+		writer = csv.DictWriter(file, ['id', 'count', 'price', 'status'])
+		writer.writeheader()
+
+		for product in holder.products_map.values():
+			if account == product.get_account_at_time_point(date):
+				writer.writerow(dict(
+					id=product.id,
+					count=product.bottles_count,
+					price=product.get_price_at_time_point(date),
+					status=product.get_status_at_time_point(date)
+				))
+
+
+def damp_collection_value_history():
+	holder = build_collection_value()
+	for date in holder.dates_set:
 		accounts = set()
-		
-		# find changed account in the winesearcher hashes
-		for hash in hash_changes_map.values():
-			if date in hash.dates_set:
-				accounts.update([product.account for product in hash.products])
 
-		orders = order_dates_map.get(date, None)
+		# find changed account in the winesearcher hashes
+		for hash in holder.hash_changes_map.values():
+			if date in hash.dates_set:
+				accounts.update([
+					product.get_account_at_time_point(date)
+					for product in hash.products
+				])
+
+		orders = holder.order_dates_map.get(date, None)
 
 		# find changed accounts in orders, there are both: buyer and seller
 		if orders:
 			accounts.update([
-				acc for order in orders 
+				acc for order in orders
 					for acc in [
-						order.buyer, 
+						order.buyer,
 						order.seller
 					]
 			])
 
 		# find changed accounts in products that changed this date
-		products = dates_product_map.get(date, None)
+		products = holder.dates_product_map.get(date, None)
 
 		if products:
 			accounts.update([product.get_account_at_time_point(date) for product in products])
 
-		# go through all products and if product account at the date is in the accounts set calculate its collection value
+		accounts_collection_value_map = dict()
 
+		for acc in accounts:
+			cv = CollectionValue(acc, date)
+
+			accounts_collection_value_map[acc] = cv
+
+			holder.collection_values.append(cv)
+
+		if len(accounts) == 0:
+			continue
+
+		# go through all products and if product account at the date is in the accounts set calculate its collection value
+		for product in holder.products_map.values():
+			status = product.get_status_at_time_point(date)
+			if status == ProductStatus.warehoused or status == ProductStatus.external:
+				collection_value = accounts_collection_value_map.get(product.get_account_at_time_point(date), None)
+
+				if collection_value:
+					collection_value.add_product(product, status)
+
+	print(f'Dates len: {len(holder.dates_set)}')
+	print(f'Product.accounts_no_last_buyer_count: {len(Product.products_with_final_account_does_not_match_last_buyer)}')
+
+	for product in Product.products_with_final_account_does_not_match_last_buyer:
+		print(f'Product: {product.id}, '
+			f'account: {product.final_account}, '
+			f'order date: {product.orders[-1].date}, '
+			f'order buyer: {product.orders[-1].buyer}')
+
+	with open(os.path.join(os.path.dirname(__file__), 'collection_value') + '.csv', mode='w') as file:
+		writer = csv.DictWriter(file, CollectionValue.props)
+
+		writer.writeheader()
+
+		for cv in holder.collection_values:
+			writer.writerow(cv.get_dict())
+
+
+def test_collection_value():
+	local_map = dict()
+	no_keys = list()
+	not_equal = dict()
+	equal = list()
+
+	with open(os.path.join(os.path.dirname(__file__), 'collection_value') + '.csv', mode='r') as file:
+		raw = csv.DictReader(file)
+
+		for row in raw:
+			local_map[(row['account'], row['date'])] = row
+
+	with open(os.path.join(os.path.dirname(__file__), 'collection_value_prod') + '.csv', mode='r') as file:
+		raw = csv.DictReader(file)
+
+		for row in raw:
+			key = (row['Account__c'], row['Changed_Date__c'])
+
+			local = local_map.get(key, None)
+
+			if not local:
+				print(f'local is not set for prod: {key}')
+				no_keys.append(key)
+				continue
+
+			if row['Bottles_Count__c'] != local['bottles'] \
+				or row['External_Bottles_Count__c'] != local['external_bottles'] \
+				or int(float(row['External_Value__c'])) != int(float(local['external_value'])) \
+				or int(float(row['Value__c'])) != int(float(local['value'])):
+				# print(f'local is not equal to prod: {local}\n{row}')
+				item = not_equal.get(row['Account__c'], list())
+				item.append((row, local))
+				not_equal[row['Account__c']] = item
+			else:
+				equal.append((row, local))
+
+	print(f'no keys: {len(no_keys)}')
+	print(f'not equal: {len(not_equal)}')
+	print(f'both: {len(not_equal)+len(no_keys)}')
+	print(f'equal: {len(equal)}')
+
+	for k,v in not_equal.items():
+		print(f'Not Equal For Account: {k}')
+		for i in v:
+			print_prod_and_local(i[0], i[1])
+		print('=================================================================')
+
+	print(sum([len(value) for value in not_equal.values()]))
+
+
+def print_prod_and_local(prod, local):
+	print(f'pr --> d:{prod["Changed_Date__c"]}, b:{prod["Bottles_Count__c"]}, v:{prod["Value__c"]}, eb:{prod["External_Bottles_Count__c"]}, ev:{prod["External_Value__c"]}')
+	print(f'lo --> d:{local["date"]}, b:{local["bottles"]}, v:{local["value"]}, eb:{local["external_bottles"]}, ev:{local["external_value"]}')
+	print('----------------------------------------------------------------')
 
 
 def test_product_hash_history(hash_changes_map):
@@ -519,7 +792,139 @@ def test_product_account_at_time_point():
 	print(product.get_account_at_time_point(point))
 
 
-if __name__ == "__main__":
-	build_collection_history()
-	# test_product_account_at_time_point()
+class TP(object):
+	def __init__(self, prod=None, local=None):
+		self.id = prod['Id'] if prod else local['id']
+		count = prod['Bottles_Count__c'] if prod else local['count']
+		self.count = int(count) if count else 0
+		price = prod['Winesearcher_Price__c'] if prod else local['price']
+		self.price = float(price) if price else 0
+		self.status = prod['Status__c'] if prod else local['status']
 
+	def compare(self, other):
+
+		if self.count != other.count:
+			print(f'{self.id} count diff: {self.count} -- {other.count}')
+		if self.price != other.price and self.status != 'Handed out' and other.status != 'Handed out':
+			print(f'{self.id} price diff: {self.price} -- {other.price}')
+		if self.status != other.status:
+			print(f'{self.id} status diff: {self.status} -- {other.status}')
+
+
+def test_account_products():
+	prod = '/Users/roman/Downloads/products_for_account_prod.csv'
+	local = '/Users/roman/Programing/python/uwbcsv/collection_value/products_for_account.csv'
+	prod_map = dict()
+	local_map = dict()
+
+	with open(prod, mode='r') as file:
+		raw = csv.DictReader(file)
+
+		for row in raw:
+			prod_map[row['Id']] = TP(prod=row)
+
+	with open(local, mode='r') as file:
+		raw = csv.DictReader(file)
+
+		for row in raw:
+			local_map[row['id']] = TP(local=row)
+
+	if len(prod_map) != len(local_map):
+		print(f'len diff {len(prod_map)} -- {len(local_map)}')
+
+	for l in local_map.values():
+		p = prod_map[l.id]
+		p.compare(l)
+
+
+def get_product_price(product, date):
+	holder = build_collection_value()
+	p = holder.products_map[product]
+	p.get_price_at_time_point(date)
+
+
+def generate_product_wine_hash_actual_prices():
+	hash_map = get_hash_changes_map()
+
+	with open(os.path.join(os.path.dirname(__file__), 'pwh_generated') + '.csv', mode='w') as file:
+		writer = csv.DictWriter(file, ['id', 'wsrid', 'date'])
+
+		writer.writeheader()
+
+		for hash in hash_map.values():
+			if hash.current is None:
+				print(hash)
+			else:
+				writer.writerow(dict(
+				id=hash.hash,
+				wsrid=hash.current.id,
+				date=hash.current.date
+			))
+
+
+class ProductToChangeDates(object):
+	def __init__(self, prod, local):
+		self.id = prod['Id']
+		self.prod = prod
+		self.local = local
+
+	def get_date(self, prod_field, local_field):
+		prod = to_datetime(self.prod[prod_field])
+		local = to_datetime(self.local[local_field])
+
+		prod = prod if prod else ''
+		local = local if local else ''
+
+		if prod > local:
+			return self.prod[prod_field]
+
+		else:
+			return self.local[local_field]
+
+	def get_dict(self):
+		return dict(
+			id=self.id,
+			incoming=self.get_date('Income_Date__c', 'incoming'),
+			warehoused=self.get_date('Warehoused_Date__c', 'warehoused'),
+			external=self.get_date('External_Date__c', 'external'),
+			deleted=self.get_date('Deleted_Date__c', 'deleted'),
+			handout=self.get_date('Hand_Out_Date__c', 'handout'),
+		)
+
+
+def change_product_dates():
+	local_map = dict()
+	products = list()
+
+	with open(os.path.join(os.path.dirname(__file__), 'products_migrated_status1') + '.csv', mode='r') as file:
+		raw = csv.DictReader(file)
+		for row in raw:
+			local_map[row['id']] = row
+
+	with open(os.path.join(os.path.dirname(__file__), 'products_to_update_with_dates') + '.csv', mode='r') as file:
+		raw = csv.DictReader(file)
+		for row in raw:
+			local = local_map[row['Id']]
+
+			product = ProductToChangeDates(row, local)
+			products.append(product)
+
+	with open(os.path.join(os.path.dirname(__file__), 'products_to_update_with_dates_w') + '.csv', mode='w') as file:
+		writer = csv.DictWriter(file, ['id', 'incoming', 'warehoused', 'handout', 'external', 'deleted'])
+		writer.writeheader()
+
+		for product in products:
+			writer.writerow(product.get_dict())
+
+
+
+if __name__ == "__main__":
+	# damp_collection_value_history()
+	# test_product_account_at_time_point()
+	# test_collection_value()
+	# test_built_collection('a0G1t000005xmrUEAQ', datetime.date(2020, 5, 14)) # Not Equal For Account: 0011t00000NS4ggAAD
+	# test_get_products_by_account_for_day('0011t00000NS4foAAD', datetime.date(2020, 5, 14))
+	test_account_products()
+	# get_product_price('a0G2o00001SaI5lEAF', datetime.date(2020, 5, 13))
+	# migrate_product_status_changes()
+	# change_product_dates()
